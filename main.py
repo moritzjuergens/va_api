@@ -111,7 +111,6 @@ def check_answer():
 @app.route("/finish", methods=["POST"])
 def finish_quiz():
     payload = request.json
-    score = 0
     try:
         game = client.postgrest.from_("games").select(
             "*").eq('game_id', payload["game_id"]).execute()
@@ -122,11 +121,13 @@ def finish_quiz():
     for g in game.data:
         for question in g["game_info"]["questions"]:
             if(question["corr_idx"] == question["answer_given"]):
-                score += 1
+                g["game_info"]["score"] += 1
+            else:
+                g["game_info"]["score"] -= 1
         try:
             client.postgrest.from_("highscores").upsert({
                 "name": g["game_info"]["name"],
-                "score": score
+                "score": question["score"]
             }).execute()
         except Exception as err:
             print(err)
