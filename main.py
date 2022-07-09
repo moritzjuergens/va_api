@@ -97,7 +97,7 @@ def check_answer():
         print(err)
         return Response(err, status=550)
 
-    for question in game.questions:
+    for question in game.game_info["questions"]:
         if(question.id != payload.question_id):
             continue
         question.answer_given = payload.answer_given
