@@ -124,7 +124,7 @@ def finish_quiz():
             if(question["corr_idx"] == question["answer_given"]):
                 score += 1
         try:
-            client.postgrest.from_("highscores").insert({
+            client.postgrest.from_("highscores").upsert({
                 "name": g["game_info"]["name"],
                 "score": score
             }).execute()
