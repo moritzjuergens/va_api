@@ -125,17 +125,16 @@ def finish_quiz():
                 g["game_info"]["score"] += 1
             else:
                 g["game_info"]["score"] -= 1
-            score = g["game_info"]["score"]
         try:
             client.postgrest.from_("highscores").upsert({
                 "name": g["game_info"]["name"],
-                "score": question["score"]
+                "score": g["game_info"]["score"]
             }).execute()
         except Exception as err:
             print(err)
             return Response(status=600)
 
-    return Response(json.dumps({"score": score}))
+    return Response(json.dumps({"score": "score"}))
 
 
 # @app.route("/results", methods=["POST"])
