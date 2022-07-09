@@ -1,0 +1,6 @@
+flask 
+requests
+supabase 
+flask_cors 
+gunicorn
+Flask-UUID

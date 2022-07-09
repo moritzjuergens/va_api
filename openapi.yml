@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: Verteilte Anwendungen API
+  version: '1.1'
+  description: Gruppe 04
+paths:
+  /highscores:
+    get:
+      summary: returns entire highscores table
+      description: Gibt den gesamten Inhalt der "highscores" Tabelle wieder. Diese Route wird genutzt, um am Ende des Spiels die historischen Spielstände abzurufen.
+      responses:
+        '200':
+          description: Query Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                  - score
+                properties:
+                  name: 
+                    type: string
+                  score:
+                    type: number
+        '400':
+          description: Bad Request
+  /questions:
+    get:
+      summary: returns specified number of question-answer pairs
+      description: >- 
+        Gibt eine spezifizierte Anzahl an Frage-Antwort-Paaren zurück. Die Antworten werden als JSON-Array zurückgegeben. 
+        
+        
+        Um die richtige Antwortmöglichkeit zu differenzieren, wird zusätzlich ein corr_inx oder Correct Index zurückgegeben. 
+        Der corr_idx spannt sich von 0-2 und gibt an welche Antwort die Richtige ist.
+      parameters:
+        - name: num
+          in: query
+          description: number of question-answer pairs you want to receive
+          schema:
+            type: integer
+      tags: []
+      responses:
+        '200':
+          description: Query Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - question
+                  - answers
+                  - corr_idx
+                properties:
+                  id: 
+                    type: number
+                  question: 
+                    type: string
+                  answers: 
+                    type: array
+                    items: 
+                      type: string
+                  corr_idx: 
+                    type: number
+        '400':
+          description: Bad Request
+    post:
+      description: >- 
+        Postet neue Frage-Antwort Paare in die "Questions" Tabelle. Der Payload soll bitte als Request Body im Format 'application/json' übergeben werden - wie im Beispiel zu erkennen. 
+
+        
+        Die Antworten werden als JSON-Array übergeben. Bitte drei Antworten im String-Format übergeben und zusätzlich als corr_idx den Index der richtigen Antwort angeben. Der corr_idx geht dementsprechend von 0-2.
+      summary: post new question and answer pairs to questions table
+      requestBody:
+        required: true
+        description: ''
+        content:
+          application/json:
+            schema:
+              type: object
+              description: >-
+                Post the Question, Answers and correct answer index to the
+                questions table
+
+
+                Be advised to add answers as json array
+              example: '{"question":"sample text", "answers": ["sample", "text", "test"], "corr_idx":2}'
+              properties:
+                question: 
+                  type: string
+                answers: 
+                  type: array
+                  items: 
+                    type: string
+                corr_idx:
+                  type: number
+              required:
+                - question
+                - ' answers'
+                - corr_idx
+            example: >- 
+              {"question":"If you were to code software in this language youd only be able to type 0s and 1s.", "answers": [
+              "JavaScript",
+               "C++",
+                 "Binary"
+                ], "corr_idx":2}
+      responses:
+        '200':
+          description: Query Successful
+        '400':
+          description: Bad Request
+
+
+  /results:
+    summary: post name and score into the highscores table
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 'Post the name: String and the score: Int8 '
+              required:
+                - name
+                - score
+              example: ''
+            example: '{"name":"Test", "score":10}'
+        description: post name and score
+      summary: post game results to highscores table
+      description: >-
+        Postet den Namen des Spielers und den dazugehörigen Score.
+
+        Falls der Spieler nicht in der Datenbank vorhanden ist wird ein neuer Spieler initialisiert. Ansonsten wird nur der Score des Spielers geupdated. 
+
+
+        Zurückgegeben wird der Name des aktuellen Spielers und der bisherige Highscore bzw. ein initialer Score von null. 
+      responses:
+        '200':
+          description: Query Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                  - score
+                properties:
+                  name: 
+                    type: string
+                  score: 
+                    type: number
+        '400':
+          description: Bad Request
+

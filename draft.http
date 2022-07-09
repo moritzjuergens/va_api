@@ -1,0 +1,9 @@
+# --> 200 OK [{name: score}, ...]
+GET http://localhost:5000/highscores
+
+# --> 200 OK https://opentdb.com/api.php?amount=10&type=multiple
+GET http://localhost:5000/questions
+
+POST http://localhost:5000/results
+Content-Type: application/json
+
