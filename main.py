@@ -103,7 +103,15 @@ def check_answer():
                 continue
             question["answer_given"] = payload["answer_given"]
             correct = question["corr_idx"] == payload["answer_given"]
-
+            try:
+                client.postgrest.from_("games").update({
+                    "score": g["game_info"]["score"]
+                }).match({
+                    "game_id": payload["game_id"]
+                }).execute()
+            except Exception as err:
+                print(err)
+                return Response(status=600)
             return Response(json.dumps({"answer": correct}))
     return Response(json.dumps({"Answer": "incorrect"}))
 
@@ -121,6 +129,8 @@ def finish_quiz():
 
     for g in game.data:
         for question in g["game_info"]["questions"]:
+            print("Correct: " + str(question["corr_idx"]) +
+                  "|| Given: " + str(question["answer_given"]))
             if(question["corr_idx"] == question["answer_given"]):
                 g["game_info"]["score"] += 1
             else:
