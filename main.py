@@ -110,6 +110,7 @@ def check_answer():
 
 @app.route("/finish", methods=["POST"])
 def finish_quiz():
+    score = 0
     payload = request.json
     try:
         game = client.postgrest.from_("games").select(
@@ -124,6 +125,7 @@ def finish_quiz():
                 g["game_info"]["score"] += 1
             else:
                 g["game_info"]["score"] -= 1
+            score = g["game_info"]["score"]
         try:
             client.postgrest.from_("highscores").upsert({
                 "name": g["game_info"]["name"],
