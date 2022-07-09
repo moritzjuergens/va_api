@@ -69,10 +69,10 @@ def start(name, question_cnt):
         questions.append(temp)
     print(questions)
     game_id = str(uuid4())
-    game_info = json.dumps({
+    game_info = {
         "name": name,
         "questions": questions
-    })
+    }
 
     try:
         client.postgrest.from_("games").insert({
