@@ -89,21 +89,22 @@ def start(name, question_cnt):
 @app.route("/answer", methods=["POST"])
 def check_answer():
     payload = request.json
-
     try:
-        game = client.postgrest.from_table("games").select(
-            "*").query(f"WHERE game_id='%s'" % payload.game_id).execute()
+        game = client.postgrest.from_("games").select(
+            "*").eq('game_id', payload["game_id"]).execute()
     except Exception as err:
         print(err)
         return Response(err, status=550)
 
-    for question in game.game_info["questions"]:
-        if(question.id != payload.question_id):
-            continue
-        question.answer_given = payload.answer_given
+    for g in game.data:
+        for question in g["game_info"]["questions"]:
+            if(question["id"] != payload["question_id"]):
+                continue
+            #question["answer_given"] = payload["answer_given"]
+            correct = question["corr_idx"] == payload["answer_given"]
 
-        return Response(json.dumps({"answer": "correct"}))
-    return Response(json.dumps({"answer": "incorrect"}))
+            return Response(json.dumps({"answer": correct}))
+    return Response(json.dumps({"Answer": "incorrect"}))
 
 
 @app.route("/results", methods=["POST"])
