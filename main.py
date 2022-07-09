@@ -71,7 +71,8 @@ def start(name, question_cnt):
     game_id = str(uuid4())
     game_info = {
         "name": name,
-        "questions": questions
+        "questions": questions,
+        "score": 0
     }
 
     try:
@@ -100,26 +101,53 @@ def check_answer():
         for question in g["game_info"]["questions"]:
             if(question["id"] != payload["question_id"]):
                 continue
-            #question["answer_given"] = payload["answer_given"]
+            question["answer_given"] = payload["answer_given"]
             correct = question["corr_idx"] == payload["answer_given"]
 
             return Response(json.dumps({"answer": correct}))
     return Response(json.dumps({"Answer": "incorrect"}))
 
 
-@app.route("/results", methods=["POST"])
-def store_results():
+@app.route("/finish", methods=["POST"])
+def finish_quiz():
     payload = request.json
-
+    score = 0
     try:
-        client.postgrest.from_table("highscores").upsert({
-            "name": payload["player"],
-            "score": payload["score"]
-        }).execute()
-        return Response(status=200)
+        game = client.postgrest.from_("games").select(
+            "*").eq('game_id', payload["game_id"]).execute()
     except Exception as err:
         print(err)
-        return Response(status=500)
+        return Response(err, status=550)
+
+    for g in game.data:
+        for question in g["game_info"]["questions"]:
+            if(question["corr_idx"] == question["answer_given"]):
+                score += 1
+        try:
+            client.postgrest.from_("highscores").insert({
+                "name": g["game_info"]["name"],
+                "score": score
+            }).execute()
+        except Exception as err:
+            print(err)
+            return Response(status=600)
+
+    return Response(json.dumps({"score": score}))
+
+
+# @app.route("/results", methods=["POST"])
+# def store_results():
+#     payload = request.json
+
+#     try:
+#         client.postgrest.from_table("highscores").upsert({
+#             "name": payload["player"],
+#             "score": payload["score"]
+#         }).execute()
+#         return Response(status=200)
+#     except Exception as err:
+#         print(err)
+#         return Response(status=500)
 
 
 @app.route("/questions", methods=["POST"])
