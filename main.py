@@ -92,7 +92,7 @@ def check_answer():
 
     try:
         game = client.postgrest.from_table("games").select(
-            "*").query("WHERE game_id=" + payload.game_id).execute()
+            "*").query("WHERE game_id='" + payload.game_id+"'").execute()
     except Exception as err:
         print(err)
         return Response(err, status=500)
