@@ -104,9 +104,7 @@ def check_answer():
             question["answer_given"] = payload["answer_given"]
             correct = question["corr_idx"] == payload["answer_given"]
             try:
-                client.postgrest.from_("games").update({
-                    "score": g["game_info"]["score"]
-                }).match({
+                client.postgrest.from_("games").update('game_info: {question: %s}' % question).match({
                     "game_id": payload["game_id"]
                 }).execute()
             except Exception as err:
