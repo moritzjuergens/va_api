@@ -95,7 +95,7 @@ def check_answer():
             "*").query(f"WHERE game_id='%s'" % payload.game_id).execute()
     except Exception as err:
         print(err)
-        return Response(err, status=500)
+        return Response(err, status=550)
 
     for question in game.questions:
         if(question.id != payload.question_id):
