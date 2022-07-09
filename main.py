@@ -100,10 +100,10 @@ def check_answer():
     for question in game.questions:
         if(question.id != payload.question_id):
             continue
-        question.answer_given = payload.answer
+        question.answer_given = payload.answer_given
 
-        return Response(json.dumps({answer: "correct"}))
-    return Response(json.dumps({answer: "incorrect"}))
+        return Response(json.dumps({"answer": "correct"}))
+    return Response(json.dumps({"answer": "incorrect"}))
 
 
 @app.route("/results", methods=["POST"])
