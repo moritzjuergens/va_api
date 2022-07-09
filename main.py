@@ -22,6 +22,11 @@ client: Client = create_client(
     supabase_url=supabase_url, supabase_key=supabase_key)
 
 
+@app.route("/", methods=["GET"])
+def hello_world():
+    return 'Hello World!'
+
+
 @app.route("/highscores", methods=["GET"])
 def highscores():
     try:
