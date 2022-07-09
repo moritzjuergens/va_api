@@ -136,7 +136,7 @@ def finish_quiz():
         try:
             client.postgrest.from_("highscores").upsert({
                 "name": g["game_info"]["name"],
-                "score": g["game_info"]["score"]
+                "score": payload["score"]
             }).execute()
         except Exception as err:
             print(err)
