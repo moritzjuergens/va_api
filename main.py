@@ -47,33 +47,55 @@ def questions():
         return Response(status=500)
 
 
-@app.route("/start/<name>/<question_cnt>", methods=["GET"])
-def start(name, question_cnt):
-
-    try:
-        res = client.postgrest.from_("questions").select("*").execute()
-    except Exception as err:
-        print(err)
+@app.route("/start/<name>/<difQ>", methods=["GET"])
+def start(name, difQ):
 
     questions = []
-    print(questions)
-    #questions['answer_given'] = 0
-    for question in res.data:
-        temp = {
-            "id": question['id'],
-            "question": question['question'],
-            "answers": question["answers"],
-            "corr_idx": question["corr_idx"],
-            "answer_given": 0,
-        }
-        questions.append(temp)
-    print(questions)
     game_id = str(uuid4())
-    game_info = {
-        "name": name,
-        "questions": questions,
-        "score": 0
-    }
+    game_info = {}
+
+    if difQ == "False":
+        try:
+            res = client.postgrest.from_("questions").select("*").execute()
+        except Exception as err:
+            print(err)
+            return Response(status=501)
+
+        #questions['answer_given'] = 0
+        for question in res.data:
+            temp = {
+                "id": question['id'],
+                "question": question['question'],
+                "answers": question["answers"],
+                "corr_idx": question["corr_idx"],
+                "answer_given": 0,
+            }
+            questions.append(temp)
+        game_info = {
+            "name": name,
+            "questions": questions,
+            "score": 0
+        }
+    # API Anbindung der Gruppe 8 - Endpoint 4) get_questions
+    elif difQ == "True":
+        try:
+            res = requests.get("https://127.0.0.1:5000/questions")
+        except Exception as err:
+            print(err)
+            return Response(status=502)
+        for question in res.data:
+            temp = {
+                "id": question['id'],
+                "question": question['question'],
+                "answers": question["options"],
+                "answer_given": 0,
+            }
+            questions.append(temp)
+        game_info = {
+            "name": name,
+            "questions": questions,
+            "score": 0
+        }
 
     try:
         client.postgrest.from_("games").insert({
