@@ -54,7 +54,7 @@ def start(name, difQ):
     game_id = str(uuid4())
     game_info = {}
 
-    if difQ == "False":
+    if difQ == "false":
         try:
             res = client.postgrest.from_("questions").select("*").execute()
         except Exception as err:
@@ -77,7 +77,7 @@ def start(name, difQ):
             "score": 0
         }
     # API Anbindung der Gruppe 8 - Endpoint 4) get_questions
-    elif difQ == "True":
+    elif difQ == "true":
         try:
             res = requests.get("https://127.0.0.1:5000/questions")
         except Exception as err:
